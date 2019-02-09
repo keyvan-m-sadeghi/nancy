@@ -1,0 +1,30 @@
+{
+  "name": "nancy",
+  "version": "0.0.1",
+  "description": "How JavaScript Promise works",
+  "main": "index.js",
+  "scripts": {
+    "lint": "xo",
+    "test": "ava && xo"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/assister-ai/nancy.git"
+  },
+  "keywords": [
+    "promise",
+    "async",
+    "node",
+    "browser"
+  ],
+  "author": "Keyvan M. Sadeghi <keyvan.m.sadeghi@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/assister-ai/nancy/issues"
+  },
+  "homepage": "https://github.com/assister-ai/nancy#readme",
+  "devDependencies": {
+    "ava": "^1.2.1",
+    "xo": "^0.24.0"
+  }
+}
