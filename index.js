@@ -6,14 +6,28 @@ const states = {
 
 class Nancy {
 	constructor(executor) {
+		const members = {
+			[states.resolved]: {
+				state: states.resolved,
+				then: onResolved => Nancy.resolve(onResolved(this.value))
+			},
+			[states.rejected]: {
+				state: states.rejected,
+				then: _ => this
+			},
+			[states.pending]: {
+				state: states.pending
+			}
+		};
+		const changeState = state => Object.assign(this, members[state]);
 		const getCallback = state => value => {
 			this.value = value;
-			this.state = state;
+			changeState(state);
 		};
 
 		const resolve = getCallback(states.resolved);
 		const reject = getCallback(states.rejected);
-		this.state = states.pending;
+		changeState(states.pending);
 		try {
 			executor(resolve, reject);
 		} catch (error) {

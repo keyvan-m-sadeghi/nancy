@@ -23,3 +23,25 @@ test('simple resolve and reject works', t => {
 	t.is(p.state, states.rejected);
 	t.is(p.value, 42);
 });
+
+test('chain then sync', t => {
+	const p = Nancy.reject(42)
+		.then(() => 0)
+		.then(() => 1)
+		.then(() => 2);
+	t.is(p.state, states.rejected);
+	t.is(p.value, 42);
+
+	Nancy.resolve(0)
+		.then(value => {
+			t.is(value, 0);
+			return 1;
+		})
+		.then(value => {
+			t.is(value, 1);
+			return 2;
+		})
+		.then(value => {
+			t.is(value, 2);
+		});
+});
