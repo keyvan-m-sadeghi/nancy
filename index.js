@@ -6,10 +6,11 @@ const states = {
 
 class Nancy {
 	constructor(executor) {
+		const tryCall = callback => Nancy.try(() => callback(this.value));
 		const members = {
 			[states.resolved]: {
 				state: states.resolved,
-				then: onResolved => Nancy.resolve(onResolved(this.value))
+				then: tryCall
 			},
 			[states.rejected]: {
 				state: states.rejected,
@@ -41,6 +42,10 @@ class Nancy {
 
 	static reject(value) {
 		return new Nancy((_, reject) => reject(value));
+	}
+
+	static try(callback) {
+		return new Nancy(resolve => resolve(callback()));
 	}
 }
 
