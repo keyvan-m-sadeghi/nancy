@@ -10,11 +10,13 @@ class Nancy {
 		const members = {
 			[states.resolved]: {
 				state: states.resolved,
-				then: tryCall
+				then: tryCall,
+				catch: _ => this
 			},
 			[states.rejected]: {
 				state: states.rejected,
-				then: _ => this
+				then: _ => this,
+				catch: tryCall
 			},
 			[states.pending]: {
 				state: states.pending

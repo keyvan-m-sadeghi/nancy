@@ -44,3 +44,16 @@ test('chain then sync', t => {
 		.then(throwSomethingWrong);
 	t.is(p.state, states.rejected);
 });
+
+const anything = () => {
+	throw new Error('I can be anything because I should never get called!');
+};
+
+test.cb('chain catch sync', t => {
+	Nancy.reject(42)
+		.catch(error => error)
+		.catch(anything)
+		.then(throwSomethingWrong)
+		.catch(throwSomethingWrong)
+		.catch(() => t.end());
+});
