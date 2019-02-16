@@ -1,4 +1,5 @@
 import test from 'ava';
+import {asyncCounter} from 'async-counter';
 import {Nancy, states} from '.';
 
 test('empty executor results in a pending promise', t => {
@@ -82,4 +83,43 @@ test.cb('unpack promise value on resolve, not reject', t => {
 		.then(() => Nancy.reject(24))
 		.catch(value => t.is(value, 24))
 		.then(() => t.end());
+});
+
+const delay = () => new Nancy(resolve => setTimeout(resolve, 500));
+
+test.cb('chain then async', t => {
+	delay()
+		.then(delay)
+		.then(delay)
+		.then(() => t.end());
+});
+
+test.cb('chain catch async', t => {
+	delay()
+		.then(() => Nancy.reject())
+		.catch(throwSomethingWrong)
+		.catch(() => 42)
+		.catch(anything)
+		.then(value => t.is(value, 42))
+		.then(delay)
+		.then(throwSomethingWrong)
+		.catch(() => t.end());
+});
+
+test.cb('multiple then on single promise', t => {
+	const counter = asyncCounter(3, {onFinished: () => t.end()});
+	const p = delay();
+	p.then(counter.count);
+	p.then(counter.count);
+	p.then(delay).then(counter.count);
+});
+
+test.cb('multiple catch on single promise', t => {
+	const counter = asyncCounter(3, {onFinished: () => t.end()});
+	const p = delay()
+		.then(() => Nancy.reject());
+	p.then(anything);
+	p.catch(counter.count);
+	p.catch(counter.count);
+	p.catch(delay).then(counter.count);
 });

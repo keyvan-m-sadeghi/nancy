@@ -7,6 +7,8 @@ const states = {
 class Nancy {
 	constructor(executor) {
 		const tryCall = callback => Nancy.try(() => callback(this.value));
+		const laterCalls = [];
+		const callLater = getMember => callback => new Nancy(resolve => laterCalls.push(() => resolve(getMember()(callback))));
 		const members = {
 			[states.resolved]: {
 				state: states.resolved,
@@ -19,13 +21,18 @@ class Nancy {
 				catch: tryCall
 			},
 			[states.pending]: {
-				state: states.pending
+				state: states.pending,
+				then: callLater(() => this.then),
+				catch: callLater(() => this.catch)
 			}
 		};
 		const changeState = state => Object.assign(this, members[state]);
 		const apply = (value, state) => {
 			this.value = value;
 			changeState(state);
+			for (const laterCall of laterCalls) {
+				laterCall();
+			}
 		};
 
 		const getCallback = state => value => {

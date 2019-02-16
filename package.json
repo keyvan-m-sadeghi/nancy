@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/assister-ai/nancy#readme",
   "devDependencies": {
+    "async-counter": "^1.0.0",
     "ava": "^1.2.1",
     "xo": "^0.24.0"
   }
