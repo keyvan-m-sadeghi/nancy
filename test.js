@@ -67,3 +67,19 @@ test('subsequent resolves and rejects are ignored', t => {
 	t.is(p.state, states.rejected);
 	t.is(p.value, 42);
 });
+
+test.cb('unpack promise value on resolve, not reject', t => {
+	Nancy.reject(Nancy.resolve(Nancy.reject(42)))
+		.catch(value => {
+			t.is(value instanceof Nancy, true);
+			return value;
+		})
+		.catch(value => {
+			t.is(value, 42);
+			return value;
+		})
+		.then(value => t.is(value, 42))
+		.then(() => Nancy.reject(24))
+		.catch(value => t.is(value, 24))
+		.then(() => t.end());
+});
