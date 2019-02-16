@@ -24,8 +24,10 @@ class Nancy {
 		};
 		const changeState = state => Object.assign(this, members[state]);
 		const getCallback = state => value => {
-			this.value = value;
-			changeState(state);
+			if (this.state === states.pending) {
+				this.value = value;
+				changeState(state);
+			}
 		};
 
 		const resolve = getCallback(states.resolved);

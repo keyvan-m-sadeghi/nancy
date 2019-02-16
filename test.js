@@ -57,3 +57,13 @@ test.cb('chain catch sync', t => {
 		.catch(throwSomethingWrong)
 		.catch(() => t.end());
 });
+
+test('subsequent resolves and rejects are ignored', t => {
+	const p = new Nancy((resolve, reject) => {
+		reject(42);
+		resolve(24);
+		reject();
+	});
+	t.is(p.state, states.rejected);
+	t.is(p.value, 42);
+});
