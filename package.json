@@ -27,5 +27,15 @@
     "async-counter": "^1.0.0",
     "ava": "^1.2.1",
     "xo": "^0.24.0"
-  }
+  },
+  "engines": {
+    "node": ">=8"
+  },
+  "xo": {
+    "space": 4,
+    "rules": {
+      "unicorn/catch-error-name": 0,
+      "promise/prefer-await-to-then": 0
+    }
+}
 }
