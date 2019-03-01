@@ -28,21 +28,21 @@ class Nancy {
         };
         const changeState = state => Object.assign(this, members[state]);
         const apply = (value, state) => {
-            this.value = value;
-            changeState(state);
-            for (const laterCall of laterCalls) {
-                laterCall();
+            if (this.state === states.pending) {
+                this.value = value;
+                changeState(state);
+                for (const laterCall of laterCalls) {
+                    laterCall();
+                }
             }
         };
 
         const getCallback = state => value => {
-            if (this.state === states.pending) {
-                if (value instanceof Nancy && state === states.resolved) {
-                    value.then(value => apply(value, states.resolved));
-                    value.catch(value => apply(value, states.rejected));
-                } else {
-                    apply(value, state);
-                }
+            if (value instanceof Nancy && state === states.resolved) {
+                value.then(value => apply(value, states.resolved));
+                value.catch(value => apply(value, states.rejected));
+            } else {
+                apply(value, state);
             }
         };
 

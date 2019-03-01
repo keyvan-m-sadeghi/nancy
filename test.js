@@ -57,16 +57,6 @@ test.cb('chain catch sync', t => {
         .catch(() => t.end());
 });
 
-test('subsequent resolves and rejects are ignored', t => {
-    const p = new Nancy((resolve, reject) => {
-        reject(42);
-        resolve(24);
-        reject();
-    });
-    t.is(p.state, states.rejected);
-    t.is(p.value, 42);
-});
-
 test.cb('unpack promise value on resolve, not reject', t => {
     Nancy.reject(Nancy.resolve(Nancy.reject(42)))
         .catch(value => {
@@ -120,4 +110,40 @@ test.cb('multiple catch on single promise', t => {
     p.catch(counter.count);
     p.catch(counter.count);
     p.catch(delay).then(counter.count);
+});
+
+const carryAfterDelays = (value, numberOfDelays = 0) => {
+    let wait = Nancy.resolve();
+    for (let i = 0; i < numberOfDelays; i++) {
+        wait = wait
+            .then(delay);
+    }
+
+    return wait
+        .then(() => value);
+};
+
+test.cb('subsequent resolves and rejects are ignored', t => {
+    let p = new Nancy((resolve, reject) => {
+        reject(42);
+        reject();
+        resolve(24);
+    });
+
+    p
+        .then(value => t.fail(value))
+        .catch(value => t.is(value, 42));
+
+    const shorter = carryAfterDelays(42, 1)
+        .then(value => Nancy.reject(value));
+    const longer = carryAfterDelays(24, 2);
+    p = new Nancy(resolve => {
+        resolve(longer);
+        resolve(shorter);
+    });
+    longer
+        .then(() => p)
+        .then(value => t.fail(value))
+        .catch(value => t.is(value, 42))
+        .then(() => t.end());
 });
